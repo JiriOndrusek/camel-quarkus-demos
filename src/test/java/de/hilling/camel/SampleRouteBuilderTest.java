@@ -14,11 +14,15 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.quarkus.test.CamelQuarkusTestSupport;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 @QuarkusTest
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SampleRouteBuilderTest extends CamelQuarkusTestSupport {
 
     @Produce("direct:ftp")
@@ -30,16 +34,23 @@ class SampleRouteBuilderTest extends CamelQuarkusTestSupport {
     @EndpointInject("mock:file:sample_requests")
     protected MockEndpoint fileMock;
 
-    @Configuration
-    public static class TestConfig {
-        @Produces
-        RoutesBuilder route() {
-            return new SampleRouteBuilder();
-        }
+    @Override
+    protected RouteBuilder createRouteBuilder() {
+        return new SampleRouteBuilder();
     }
 
-    @Override
-    protected void doBeforeEach(QuarkusTestMethodContext context) throws Exception {
+//    @Override
+//    protected void doBeforeEach(QuarkusTestMethodContext context) throws Exception {
+//
+//        startRouteDefinitions();
+//        AdviceWith.adviceWith(this.context, "sampleRoute",
+//                              SampleRouteBuilderTest::enhanceRoute);
+//
+//        startRouteDefinitions();
+//    }
+    @BeforeEach
+    public void advising() throws Exception {
+
         AdviceWith.adviceWith(this.context, "sampleRoute",
                               SampleRouteBuilderTest::enhanceRoute);
     }
